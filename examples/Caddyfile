@@ -1,0 +1,29 @@
+# Template only: replace hostname and install the internal CA on clients.
+# One pilot identity. Production needs managed personal keys/auth + rate limits.
+{
+    admin off
+    auto_https disable_redirects
+}
+
+ollama.example.internal {
+    tls internal
+    log
+    @pilot {
+        method POST
+        path /v1/chat/completions
+        expression `{env.OLLAMA_PILOT_TOKEN} != ""`
+        header Authorization "Bearer {env.OLLAMA_PILOT_TOKEN}"
+    }
+    handle @pilot {
+        request_body {
+            max_size 1MB
+        }
+        reverse_proxy 127.0.0.1:11434 {
+            header_up -Authorization
+            flush_interval -1
+        }
+    }
+    handle {
+        respond "Unauthorized" 401
+    }
+}

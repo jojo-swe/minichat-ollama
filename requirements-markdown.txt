@@ -1,0 +1,2 @@
+-r requirements.txt
+rich==14.1.0
