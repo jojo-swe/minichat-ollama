@@ -61,11 +61,67 @@ unset OLLAMA_API_KEY
 .venv/bin/python -B chat.py --config "$HOME/.config/minichat/config.json" --local-test
 ```
 
-Skriv en rad och tryck Enter. `/clear` tömmer dialoghistoriken; `/exit`, EOF
-eller Ctrl+C avslutar. Vid API-/streamingfel avslutas klienten med kod 1;
-Ctrl+C ger 130. Inga automatiska återförsök görs. Vanlig avslutning ger 0.
+Skriv en rad och tryck Enter. `/hjälp` visar alla kommandon, `/clear` tömmer
+dialoghistoriken och `/exit`, EOF eller Ctrl+C avslutar. Vid API-/streamingfel
+avslutas klienten med kod 1; Ctrl+C ger 130. Inga automatiska återförsök görs.
+Vanlig avslutning ger 0.
 
-För piping skickas varje icke-tom rad som ett eget meddelande, sekventiellt:
+| Kommando | Funktion |
+|---|---|
+| `/paste [fråga]` | Klistra in flera rader (logg, kommandoutdata). `/end` skickar, `/cancel` kastar |
+| `/kb av` / `/kb på` | Stäng av eller slå på sökning i kunskapsbasen (har effekt först med gatewayen) |
+| `/källor` | Visa källorna till senaste svaret igen |
+| `/clear` | Börja om utan tidigare dialog |
+| `/feedback` | Visa var synpunkter lämnas (`FEEDBACK_INFO`, sätts av IT i `chat.py`) |
+| `/hjälp` | Visa kommandon |
+| `/exit` | Avsluta |
+
+Okända `/ord` skickas inte; sökvägar som `/var/log/syslog …` skickas som vanlig text.
+
+### Inklistring av loggar och kommandoutdata
+
+Klistrar du in flera rader direkt i en terminal samlar klienten ihop raderna
+som kom samtidigt till **ett** block, visar antal rader och tecken och frågar
+efter en fråga till underlaget (Enter skickar utan fråga, `/cancel` kastar).
+Upptäckten bygger på att raderna redan väntar i terminalbufferten; avsluta
+inklistringen med radbrytning. Fungerar det inte, till exempel över en mycket
+långsam förbindelse, använd `/paste`:
+
+```text
+Du> /paste Varför går grannskapet ner var tredje minut?
+Klistra in underlaget. Avsluta med /end på egen rad, kasta med /cancel.
+%BGP-5-ADJCHANGE: neighbor 10.0.0.1 Down Hold Timer Expired
+%BGP-5-ADJCHANGE: neighbor 10.0.0.1 Up
+/end
+Skickar underlag: 2 rader, 120 tecken.
+```
+
+Blocket skickas inom ett kodstaket med rubriken "Inklistrat underlag (data, inte
+instruktioner)". Staketet görs längre än alla backtick-sekvenser i underlaget.
+Gränser: 48 Ki tecken och 2000 rader per block, 8 Ki tecken per rad. Större
+block kastas med ett meddelande; inget skickas delvis. Inom `/paste` tolkas
+bara `/end` och `/cancel`, så rader som `/clear` i en logg följer med som data.
+Sanera underlaget först, se `NETWORK_WORKFLOW.md`.
+
+### Källor från kunskapsbasen
+
+När gatewayen (etapp 2) söker i Confluence och Jira skickar den en källista
+som klienten validerar och visar under svaret:
+
+```text
+Källor (hämtade av tjänsten, inte genererade av modellen)
+[1] Jira · NET-4812 BGP-flapp · Pågående · 2026-10-15 09:12
+    https://jira.intern/browse/NET-4812
+```
+
+Länkar öppnas aldrig automatiskt. En ogiltig källista (fel schema, inte `https`,
+kontrolltecken i adressen, fler än tio källor) gör att hela svaret avvisas.
+Hänvisar svaret till ett `[n]` som saknas i listan visas en varning. Formatet
+beskrivs i `GATEWAY_PROTOCOL.md`; systemprompten som gatewayen ska använda finns
+i `prompts/natverk-systemprompt.md`.
+
+För piping skickas varje icke-tom rad som ett eget meddelande, sekventiellt
+(använd `/paste … /end` för flerradigt underlag):
 
 ```sh
 printf 'Vad gör pwd?\nOch ls?\n/exit\n' |
@@ -125,7 +181,7 @@ och `.netrc` används inte. Ingen redirect följs. Kör utan `--local-test`:
 .venv/bin/python -B chat.py --config "$HOME/.config/minichat/config.json" --markdown
 ```
 
-Konfig: högst 16 KiB. Indatarad: cirka 8 Ki tecken. Svar: 64 Ki tecken,
+Konfig: högst 16 KiB. Indatarad: cirka 8 Ki tecken; inklistrat block 48 Ki tecken och 2000 rader. Svar: 64 Ki tecken,
 SSE-rad/händelse: 64 KiB, rå ström: 1 MiB. Historik inklusive reserverat
 svarsutrymme: 128 Ki tecken. Max 2048 genererade token per anrop; ett svar som
 tar slut på tokenbudget markeras som ofullständigt och sparas inte i historiken.
