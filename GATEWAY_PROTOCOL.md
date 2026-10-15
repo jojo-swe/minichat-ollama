@@ -15,7 +15,7 @@ gatewayen skickar dem.
 | `messages` | `user`/`assistant`, aldrig `system` från klienten | Avvisar `system` och andra roller; lägger in systemprompten |
 | `stream` | `true` | Avvisar annat |
 | `max_tokens` | 2048 | Begränsar till serverns tak |
-| `x_kb` | Utelämnas normalt; `false` efter `/kb av` | Hoppar då över sökningen; loggas i audit |
+| `x_kb` | Utelämnas normalt; `false` efter `/kb off` | Hoppar då över sökningen; loggas i audit |
 
 Alla andra fält (`tools`, `tool_choice`, `functions`, `response_format`, `options`
 m.fl.) ska avvisas med HTTP 400. Gatewayen räknar token för systemprompt,

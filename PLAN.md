@@ -25,9 +25,9 @@ Redovisa protokolltester separat från riktig inferens och driftsatt proxy/sandb
 Från beslutsunderlaget v1.5, avsnitt 9.1 och 12.9.
 
 4. Flerradig inklistring (`/paste`, `/end`, `/cancel` och automatisk upptäckt på TTY),
-   `/hjälp`, `/feedback`, fångade okända kommandon.
+   `/help`, `/feedback`, fångade okända kommandon.
 5. Källhändelse `x_sources` från gatewayen: strikt validering, separat visning,
-   `/källor`, `/kb av|på` (`x_kb`), varning för okända hänvisningar.
+   `/sources`, `/kb off|on` (`x_kb`), varning för okända hänvisningar.
 6. `NETWORK_WORKFLOW.md`, `prompts/natverk-systemprompt.md`, `GATEWAY_PROTOCOL.md`.
 
 Kvar före användarpilot (utanför klienten): gateway med personliga nycklar,

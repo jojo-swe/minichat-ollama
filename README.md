@@ -61,7 +61,7 @@ unset OLLAMA_API_KEY
 .venv/bin/python -B chat.py --config "$HOME/.config/minichat/config.json" --local-test
 ```
 
-Skriv en rad och tryck Enter. `/hjälp` visar alla kommandon, `/clear` tömmer
+Skriv en rad och tryck Enter. `/help` visar alla kommandon, `/clear` tömmer
 dialoghistoriken och `/exit`, EOF eller Ctrl+C avslutar. Vid API-/streamingfel
 avslutas klienten med kod 1; Ctrl+C ger 130. Inga automatiska återförsök görs.
 Vanlig avslutning ger 0.
@@ -69,14 +69,14 @@ Vanlig avslutning ger 0.
 | Kommando | Funktion |
 |---|---|
 | `/paste [fråga]` | Klistra in flera rader (logg, kommandoutdata). `/end` skickar, `/cancel` kastar |
-| `/kb av` / `/kb på` | Stäng av eller slå på sökning i kunskapsbasen (har effekt först med gatewayen) |
-| `/källor` | Visa källorna till senaste svaret igen |
+| `/kb off` / `/kb on` | Stäng av eller slå på sökning i kunskapsbasen (har effekt först med gatewayen) |
+| `/sources` | Visa källorna till senaste svaret igen |
 | `/clear` | Börja om utan tidigare dialog |
 | `/feedback` | Visa var synpunkter lämnas (`FEEDBACK_INFO`, sätts av IT i `chat.py`) |
-| `/hjälp` | Visa kommandon |
+| `/help` | Visa kommandon |
 | `/exit` | Avsluta |
 
-Okända `/ord` skickas inte; sökvägar som `/var/log/syslog …` skickas som vanlig text.
+Kommandona är på engelska; meddelanden och svar är på svenska. Okända `/ord`, även svenska varianter som `/hjälp`, skickas inte; sökvägar som `/var/log/syslog …` skickas som vanlig text.
 
 ### Inklistring av loggar och kommandoutdata
 

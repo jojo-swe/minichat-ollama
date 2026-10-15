@@ -374,7 +374,7 @@ class CLIFeatureTests(unittest.TestCase):
 
     def test_commands_paths_and_long_lines(self):
         code, _, err, received = self.run_cli(
-            "/hjälp\n/okänt\n/kb\n/feedback\n/källor\n" + "y" * (chat.MAX_INPUT + 50) + "\n/var/log/syslog vad är detta?\n/exit\n")
+            "/help\n/hjälp\n/kb\n/kb av\n/feedback\n/sources\n" + "y" * (chat.MAX_INPUT + 50) + "\n/var/log/syslog vad är detta?\n/exit\n")
         self.assertEqual(code, 0)
         self.assertEqual([r["messages"][0]["content"] for r in received], ["/var/log/syslog vad är detta?"])
         for text in ("/paste [fråga]", "Okänt kommando", "Ingen feedbackkanal", "Inga källor", "längre än"):
@@ -382,7 +382,7 @@ class CLIFeatureTests(unittest.TestCase):
 
     def test_kb_toggle_sources_and_warning(self):
         body = sources_event([SOURCE]) + sse("Se [1] och [2].")
-        code, out, err, received = self.run_cli("/kb av\nfråga\n/kb på\nfråga\n/källor\n/exit\n", body)
+        code, out, err, received = self.run_cli("/kb off\nfråga\n/kb on\nfråga\n/sources\n/exit\n", body)
         self.assertEqual(code, 0)
         self.assertIs(received[0]["x_kb"], False)
         self.assertNotIn("x_kb", received[1])

@@ -5,8 +5,8 @@
 - Nya kontroller: `/paste` med fråga, `/end`, `/cancel`, tomt block, för stort
   block, EOF före `/end`; att `/clear` och sökvägar inuti ett block följer med
   som data; okända kommandon skickas inte men `/var/log/…`-frågor gör det;
-  för långa rader avvisas utan att sessionen avslutas; `/kb av` ger `x_kb: false`
-  och `/kb på` tar bort fältet; källhändelse valideras (schema, `https`, kontroll-
+  för långa rader avvisas utan att sessionen avslutas; `/kb off` ger `x_kb: false`
+  och `/kb on` tar bort fältet; källhändelse valideras (schema, `https`, kontroll-
   tecken, dubbletter, max tio, två händelser) och visas separat; varning för
   hänvisning utanför källistan; kodstaket längre än backticks i underlaget.
 - Automatisk upptäckt av inklistring testad mot riktig pseudoterminal (pty),

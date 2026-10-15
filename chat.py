@@ -25,12 +25,13 @@ MAX_SOURCES, MAX_FIELD, MAX_URL = 10, 300, 2048
 SOURCE_KINDS = {"confluence": "Confluence", "jira": "Jira", "dokument": "Dokument"}
 COMMAND = re.compile(r"/[^\s/]+")
 HELP = """Kommandon:
-  /paste [fråga]  klistra in flera rader; avsluta med /end, kasta med /cancel
-  /kb av | /kb på stäng av eller slå på sökning i kunskapsbasen (kräver gateway)
-  /källor         visa källorna till senaste svaret igen
-  /clear          börja om utan tidigare dialog
-  /feedback       var du lämnar synpunkter
-  /exit           avsluta
+  /paste [fråga]   klistra in flera rader; avsluta med /end, kasta med /cancel
+  /kb off | /kb on stäng av eller slå på sökning i kunskapsbasen (kräver gateway)
+  /sources         visa källorna till senaste svaret igen
+  /clear           börja om utan tidigare dialog
+  /feedback        var du lämnar synpunkter
+  /help            visa denna hjälp
+  /exit            avsluta
 Klistrar du in flera rader direkt samlas de till ett block automatiskt.
 Modellen kan ha fel. Granska alltid kommandon innan du kör dem själv."""
 
@@ -321,7 +322,7 @@ def main():
                           timeout=httpx.Timeout(30, connect=5),
                           limits=httpx.Limits(max_connections=1)) as client:
             if interactive:
-                note("Textassistent · /hjälp visar kommandon · /exit avslutar")
+                note("Textassistent · /help visar kommandon · /exit avslutar")
             while True:
                 if interactive:
                     print("Du> ", end="", flush=True, file=sys.stderr)
@@ -353,14 +354,14 @@ def main():
                     last_sources = []
                     note("Historiken tömd.")
                     continue
-                elif prompt in ("/hjälp", "/help"):
+                elif prompt == "/help":
                     note(HELP)
                     continue
-                elif prompt in ("/kb av", "/kb off", "/kb på", "/kb pa", "/kb on"):
-                    kb = prompt.split()[1] in ("på", "pa", "on")
+                elif prompt in ("/kb off", "/kb on"):
+                    kb = prompt == "/kb on"
                     note("Kunskapsbasen används." if kb else "Kunskapsbasen används inte för kommande frågor.")
                     continue
-                elif prompt in ("/källor", "/kallor"):
+                elif prompt == "/sources":
                     note(render_sources(last_sources).lstrip() if last_sources else "Inga källor i senaste svaret.")
                     continue
                 elif prompt == "/feedback":
@@ -384,7 +385,7 @@ def main():
                     note(f"Skickar underlag: {block.count(chr(10)) + 1} rader, {len(block)} tecken.")
                     prompt = compose(question, block)
                 elif COMMAND.fullmatch(prompt.split(" ", 1)[0]):
-                    note("Okänt kommando. Skriv /hjälp.")
+                    note("Okänt kommando. Skriv /help.")
                     continue
                 if not prompt.strip():
                     continue
