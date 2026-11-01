@@ -90,8 +90,8 @@ långsam förbindelse, använd `/paste`:
 ```text
 Du> /paste Varför går grannskapet ner var tredje minut?
 Klistra in underlaget. Avsluta med /end på egen rad, kasta med /cancel.
-%BGP-5-ADJCHANGE: neighbor 10.0.0.1 Down Hold Timer Expired
-%BGP-5-ADJCHANGE: neighbor 10.0.0.1 Up
+%BGP-5-ADJCHANGE: neighbor 10.x.y.z Down Hold Timer Expired
+%BGP-5-ADJCHANGE: neighbor 10.x.y.z Up
 /end
 Skickar underlag: 2 rader, 120 tecken.
 ```
