@@ -198,6 +198,46 @@ class StreamTests(unittest.TestCase):
 
 
 class CLITests(unittest.TestCase):
+    def run_input(self, text):
+        with patch.object(chat, "configuration", return_value=(chat.LOCAL_ENDPOINT, "local", "")), \
+             patch.object(sys, "argv", ["chat.py", "--config", "unused", "--local-test"]), \
+             patch.object(sys, "stdin", io.StringIO(text)), \
+             patch.object(sys, "stdout", io.StringIO()), patch.object(sys, "stderr", io.StringIO()), \
+             patch.object(chat, "answer", return_value="Svar") as answer:
+            code = chat.main()
+        return code, answer.call_args_list
+
+    def test_paste_preserves_block_and_commands_as_data(self):
+        block = "Port A\n  errors: 10\n\n/clear\n/exit\n"
+        code, calls = self.run_input("/paste\n" + block + "/end\n/exit\n")
+        self.assertEqual(code, 0)
+        self.assertEqual(len(calls), 1)
+        messages = calls[0].args[4]
+        self.assertEqual(messages[0], {"role": "system", "content": chat.SYSTEM_PROMPT})
+        self.assertEqual(messages[1], {"role": "user", "content": block})
+
+    def test_paste_cancel_eof_and_empty_do_not_send(self):
+        for text in ("/paste\nsecret\n/cancel\n/exit\n", "/paste\nunsubmitted", "/paste\n/end\n/exit\n"):
+            with self.subTest(text=text):
+                code, calls = self.run_input(text)
+                self.assertEqual(code, 0)
+                self.assertEqual(calls, [])
+
+    def test_oversized_paste_sends_nothing(self):
+        for text in ("x" * (chat.MAX_INPUT + 1), ("x\n" * (chat.MAX_INPUT // 2 + 1))):
+            code, calls = self.run_input("/paste\n" + text + "\n/end\n")
+            self.assertEqual(code, 1)
+            self.assertEqual(calls, [])
+
+    def test_clear_keeps_profile_without_previous_incident(self):
+        code, calls = self.run_input("incident A\n/clear\nincident B\n/exit\n")
+        self.assertEqual(code, 0)
+        self.assertEqual(len(calls), 2)
+        self.assertEqual(calls[1].args[4], [
+            {"role": "system", "content": chat.SYSTEM_PROMPT},
+            {"role": "user", "content": "incident B"},
+        ])
+
     def test_history_clear_pipe_and_env_proxy(self):
         received = []
         class Handler(BaseHTTPRequestHandler):
@@ -232,7 +272,8 @@ class CLITests(unittest.TestCase):
                      patch.dict(os.environ, {"HTTP_PROXY": "http://127.0.0.1:1", "OLLAMA_API_KEY": ""}):
                     self.assertEqual(chat.main(), 0)
                 self.assertEqual(output.getvalue(), "Svar\nSvar\nSvar\n")
-                self.assertEqual([len(r["messages"]) for r in received], [1, 3, 1])
+                self.assertEqual([len(r["messages"]) for r in received], [2, 4, 2])
+                self.assertTrue(all(r["messages"][0]["role"] == "system" for r in received))
             server.shutdown()
             worker.join()
 

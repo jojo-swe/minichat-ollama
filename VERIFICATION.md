@@ -1,5 +1,19 @@
 # Verifiering 2026-10-12
 
+## Tillägg 2026-10-13: nätverksprofil och flerradig inmatning
+
+- Klienten är nu 250 rader och har en fast systeminstruktion för Cisco IOS,
+  FortiOS och Linux. Den tillför ingen åtkomst till nätutrustning.
+- 29 tester passerar i Ubuntu/WSL efter tillägget: inkluderar bevarade indrag
+  och radbrytningar, `/cancel`, EOF, tomma/för stora block och att `/clear`
+  tar bort föregående ärende men behåller systeminstruktionen.
+- Den slutliga Cisco-/FortiOS-formuleringen av instruktionen är statiskt
+  kontrollerad. Ingen ny modellutvärdering av diagnoskvalitet har genomförts.
+- POC.md version 1.4 och NETWORK_WORKFLOW.md beskriver önskat beteende och
+  manuella labbfall. De är inte bevis för korrekt felsökning på faktisk utrustning.
+
+## Ursprunglig klientverifiering 2026-10-12
+
 - `chat.py`: 223 rader, Python AST parsas utan fel.
 - Ubuntu 24.04 i WSL, Python 3.12.3: 25 unittest-tester passerar.
 - Kontroller omfattar konfig/0600/ägare/symlänk/hårdlänk/FIFO, exakt allowlist,

@@ -1,9 +1,18 @@
-# Minichat – lokal textassistent
+# Minichat – lokal nätverksassistent
+
+[Beslutsunderlag för PoC:n, version 1.4](POC.md) beskriver omfattning,
+säkerhetskrav, utvärdering, budget och beslutspunkter.
 
 En liten Linux-klient för Ollamas OpenAI-kompatibla streaming-API. Modellen
 producerar bara text. Klienten har inga verktyg, subprocesser, shellfunktioner,
 filuppladdningar, webbläsning eller diskhistorik. Modellens kommandoförslag
 granskas och kopieras manuellt av användaren.
+
+Fokus är Cisco IOS, därefter FortiOS och Linux. Den fasta nätverksinstruktionen
+ber modellen skilja observationer från hypoteser,
+efterfråga plattform/version och föreslå riktade kontroller med förväntat resultat.
+Detta är önskat modellbeteende, inte verifierad nätverksexpertis eller en
+säkerhetsbarriär. [Ärendemall och utvärdering](NETWORK_WORKFLOW.md).
 
 ## Kom igång på Linux
 
@@ -71,6 +80,15 @@ För piping skickas varje icke-tom rad som ett eget meddelande, sekventiellt:
 printf 'Vad gör pwd?\nOch ls?\n/exit\n' |
   .venv/bin/python -B chat.py --config "$HOME/.config/minichat/config.json" --local-test
 ```
+
+För loggar och kommandoutdata: skriv `/paste`, klistra in ett granskat textblock
+och avsluta med `/end` på egen rad. Hela blocket skickas som ett meddelande;
+indrag och radbrytningar bevaras. `/cancel` på egen rad eller EOF kastar det
+ofärdiga blocket. Högst 8192 tecken inklusive radbrytningar; för stort block
+avslutar sessionen utan att skicka blocket. Inne i blocket är exempelvis
+`/clear` vanlig text; `/end` och `/cancel` är reserverade avslutningsrader.
+Klienten maskerar inte hemligheter automatiskt. Börja ett nytt ärende med
+`/clear`; nätverksinstruktionen behålls, tidigare dialog skickas inte igen.
 
 ## Steg 3: Markdown och granskning
 
