@@ -1,3 +1,5 @@
+<p align="center"><img src=".github/assets/logo.svg" alt="minichat-ollama logo" width="128"></p>
+
 # Minichat – lokal textassistent
 
 En liten Linux-klient för Ollamas OpenAI-kompatibla streaming-API. Modellen
